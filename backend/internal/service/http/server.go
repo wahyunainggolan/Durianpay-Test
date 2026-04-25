@@ -2,15 +2,20 @@ package http
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
+	"github.com/durianpay/fullstack-boilerplate/internal/config"
 	"github.com/durianpay/fullstack-boilerplate/internal/openapigen"
+	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/go-chi/chi/v5"
+	"github.com/golang-jwt/jwt/v5"
 	oapinethttpmw "github.com/oapi-codegen/nethttp-middleware"
 )
 
@@ -38,6 +43,10 @@ func NewServer(apiHandler openapigen.ServerInterface, openapiYamlPath string) *S
 			&oapinethttpmw.Options{
 				DoNotValidateServers:  true,
 				SilenceServersWarning: true,
+
+				Options: openapi3filter.Options{
+					AuthenticationFunc: AuthenticationFunc,
+				},
 			},
 		))
 		openapigen.HandlerFromMux(apiHandler, api)
@@ -46,6 +55,36 @@ func NewServer(apiHandler openapigen.ServerInterface, openapiYamlPath string) *S
 	return &Server{
 		router: r,
 	}
+}
+
+func AuthenticationFunc(ctx context.Context, input *openapi3filter.AuthenticationInput) error {
+	req := input.RequestValidationInput.Request
+
+	authHeader := req.Header.Get("Authorization")
+
+	/* case kalau login, tanpan. token*/
+	if strings.Contains(req.URL.Path, "/auth/login") {
+		return nil
+	}
+
+	if authHeader == "" {
+		return fmt.Errorf("missing token")
+	}
+
+	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method")
+		}
+		return config.JwtSecret, nil
+	})
+
+	if err != nil || !token.Valid {
+		return fmt.Errorf("invalid token")
+	}
+
+	return nil
 }
 
 func (s *Server) Start(addr string) {

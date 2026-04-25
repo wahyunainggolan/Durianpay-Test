@@ -10,7 +10,11 @@ import (
 	ah "github.com/durianpay/fullstack-boilerplate/internal/module/auth/handler"
 	ar "github.com/durianpay/fullstack-boilerplate/internal/module/auth/repository"
 	au "github.com/durianpay/fullstack-boilerplate/internal/module/auth/usecase"
+	ph "github.com/durianpay/fullstack-boilerplate/internal/module/payment/handler"
+	pr "github.com/durianpay/fullstack-boilerplate/internal/module/payment/repository"
+	pu "github.com/durianpay/fullstack-boilerplate/internal/module/payment/usecase"
 	srv "github.com/durianpay/fullstack-boilerplate/internal/service/http"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
@@ -36,13 +40,17 @@ func main() {
 	}
 
 	userRepo := ar.NewUserRepo(db)
+	paymentRepo := pr.NewPaymentRepo(db)
 
 	authUC := au.NewAuthUsecase(userRepo, config.JwtSecret, JwtExpiredDuration)
+	paymentUC := pu.NewPaymentUsecase(paymentRepo)
 
 	authH := ah.NewAuthHandler(authUC)
+	paymentHandler := ph.NewPaymentHandler(paymentUC)
 
 	apiHandler := &api.APIHandler{
-		Auth: authH,
+		Auth:    authH,
+		Payment: paymentHandler,
 	}
 
 	server := srv.NewServer(apiHandler, config.OpenapiYamlLocation)
@@ -60,6 +68,15 @@ func initDB(db *sql.DB) error {
 		  email TEXT NOT NULL UNIQUE,
 		  password_hash TEXT NOT NULL,
 		  role TEXT NOT NULL
+		);`,
+
+		/* Table payments */
+		`CREATE TABLE IF NOT EXISTS payments (
+			id TEXT PRIMARY KEY,
+			merchant TEXT,
+			amount TEXT,
+			status TEXT,
+			created_at DATETIME
 		);`,
 	}
 	for _, s := range stmts {
@@ -86,6 +103,25 @@ func initDB(db *sql.DB) error {
 		}
 	}
 
+	/* seed payments */
+	var paymentCount int
+	row = db.QueryRow("SELECT COUNT(1) FROM payments")
+	if err := row.Scan(&paymentCount); err != nil {
+		return err
+	}
+
+	if paymentCount == 0 {
+		_, err := db.Exec(`
+		INSERT INTO payments (id, merchant, amount, status, created_at) VALUES
+		('1', 'Tokopedia', '150000', 'completed', datetime('now')),
+		('2', 'Shopee', '200000', 'failed', datetime('now')),
+		('3', 'Bukalapak', '300000', 'processing', datetime('now')),
+		('4', 'Lazada', '500000', 'completed', datetime('now'))
+	`)
+		if err != nil {
+			return err
+		}
+	}
 	const dbLifetime = time.Minute * 5
 	db.SetConnMaxLifetime(dbLifetime)
 	return nil

@@ -26,17 +26,20 @@ func (a *AuthHandler) PostDashboardV1AuthLogin(w http.ResponseWriter, r *http.Re
 	if !decodeJSONBody(w, r, &req) {
 		return
 	}
+
 	token, user, err := a.authUC.Login(req.Email, req.Password)
 	if err != nil {
 		transport.WriteError(w, err)
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(openapigen.LoginResponse{Email: &user.Email, Role: &user.Role, Token: &token})
-	if err != nil {
-		transport.WriteAppError(w, entity.ErrorInternal("internal server error"))
-		return
+	resp := openapigen.LoginResponse{
+		Email: &user.Email,
+		Role:  &user.Role,
+		Token: &token,
 	}
+
+	transport.WriteSuccess(w, resp)
 }
 
 func decodeJSONBody(w http.ResponseWriter, r *http.Request, dst any) bool {
