@@ -39,6 +39,13 @@ type Payment struct {
 	Status    *string    `json:"status,omitempty"`
 }
 
+type PaymentSummary struct {
+	Total      int `json:"total"`
+	Completed  int `json:"completed"`
+	Processing int `json:"processing"`
+	Failed     int `json:"failed"`
+}
+
 // User defines model for User.
 type User struct {
 	Email *string `json:"email,omitempty"`
@@ -54,7 +61,8 @@ type LoginResponse = User
 
 // PaymentListResponse defines model for PaymentListResponse.
 type PaymentListResponse struct {
-	Payments *[]Payment `json:"payments,omitempty"`
+	Payments *[]Payment      `json:"payments,omitempty"`
+	Summary  *PaymentSummary `json:"summary,omitempty"`
 }
 
 // UnauthorizedError defines model for UnauthorizedError.

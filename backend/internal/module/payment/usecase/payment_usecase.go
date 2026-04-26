@@ -7,6 +7,7 @@ import (
 
 type PaymentUsecase interface {
 	GetPayments(status *string) ([]entity.Payment, error)
+	GetSummary() (*entity.PaymentSummary, error)
 }
 
 type paymentUC struct {
@@ -19,4 +20,8 @@ func NewPaymentUsecase(repo repository.PaymentRepository) PaymentUsecase {
 
 func (u *paymentUC) GetPayments(status *string) ([]entity.Payment, error) {
 	return u.repo.GetPayments(status)
+}
+
+func (u *paymentUC) GetSummary() (*entity.PaymentSummary, error) {
+	return u.repo.GetSummary()
 }

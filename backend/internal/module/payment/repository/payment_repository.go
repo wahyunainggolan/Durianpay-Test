@@ -8,6 +8,7 @@ import (
 
 type PaymentRepository interface {
 	GetPayments(status *string) ([]entity.Payment, error)
+	GetSummary() (*entity.PaymentSummary, error)
 }
 
 type paymentRepo struct {
@@ -45,4 +46,31 @@ func (r *paymentRepo) GetPayments(status *string) ([]entity.Payment, error) {
 	}
 
 	return result, nil
+}
+
+func (r *paymentRepo) GetSummary() (*entity.PaymentSummary, error) {
+	query := `
+		SELECT
+			COUNT(*) as total,
+			SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed,
+			SUM(CASE WHEN status = 'processing' THEN 1 ELSE 0 END) as processing,
+			SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed
+		FROM payments
+	`
+
+	row := r.db.QueryRow(query)
+
+	var summary entity.PaymentSummary
+	err := row.Scan(
+		&summary.Total,
+		&summary.Completed,
+		&summary.Processing,
+		&summary.Failed,
+	)
+
+	if err != nil {
+		return nil, entity.ErrorInternal("failed to get summary")
+	}
+
+	return &summary, nil
 }

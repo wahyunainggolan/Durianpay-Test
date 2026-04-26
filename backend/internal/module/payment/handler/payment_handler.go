@@ -50,7 +50,21 @@ func (h *PaymentHandler) GetPayments(
 		})
 	}
 
+	summaryEntity, err := h.paymentUC.GetSummary()
+	if err != nil {
+		transport.WriteError(w, err)
+		return
+	}
+
+	summary := openapigen.PaymentSummary{
+		Total:      summaryEntity.Total,
+		Completed:  summaryEntity.Completed,
+		Processing: summaryEntity.Processing,
+		Failed:     summaryEntity.Failed,
+	}
+
 	response := openapigen.PaymentListResponse{
+		Summary:  &summary,
 		Payments: &res,
 	}
 
