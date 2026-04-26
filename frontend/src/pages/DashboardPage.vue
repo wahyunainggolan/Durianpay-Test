@@ -57,7 +57,7 @@
 <script setup>
 import "../styles/pages/dashboard.css"
 import { ref, onMounted } from "vue"
-import { getPayments } from "@/services/paymentService"
+import { getPayments } from "../services/paymentService"
 import BaseTable from "../components/BaseTable.vue"
 import SummaryCard from "../components/SummaryCard.vue"
 import { Formatter } from "../utils/formatter"

@@ -48,6 +48,8 @@
 import "../styles/pages/login.css"
 import { ref } from "vue"
 import { useRouter } from "vue-router"
+import { loginService } from "../services/authService"
+
 import axios from "axios"
 
 const email = ref("")
@@ -65,6 +67,7 @@ const login = async () => {
       email: email.value,
       password: password.value
     })
+    console.log(res)
 
     const data = res.data.data
 
