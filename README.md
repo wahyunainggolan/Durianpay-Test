@@ -38,11 +38,8 @@ mv env.example .env
 2. Configure your environment variables in .env, especially update JWT_SECRET=supersecret
 3. Build and run the backend using Docker: 
 ```bash
-docker-compose up --build -d
-```
-4. Verify containers are running:
-```bash
-docker ps
+docker-compose build --no-cache
+docker-compose up
 ```
 
 Or build manually:
@@ -74,13 +71,10 @@ B. Or via docker-compose:
 mv env.example .env
 ```
 2. Configure your environment variables in .env, especially update JWT_SECRET=supersecret
-3. Build and run the backend using Docker: 
+3. Build and run the frontend using Docker: 
 ```bash
-docker-compose up --build -d
-```
-4. Verify containers are running:
-```bash
-docker ps
+docker-compose build --no-cache
+docker-compose up
 ```
 
 
