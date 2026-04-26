@@ -61,13 +61,10 @@ const login = async () => {
     loading.value = true
     error.value = ""
 
-    const res = await axios.post(
-      "http://localhost:8080/dashboard/v1/auth/login",
-      {
-        email: email.value,
-        password: password.value
-      }
-    )
+    const res = await loginService({
+      email: email.value,
+      password: password.value
+    })
 
     const data = res.data.data
 

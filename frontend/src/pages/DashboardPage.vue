@@ -57,7 +57,7 @@
 <script setup>
 import "../styles/pages/dashboard.css"
 import { ref, onMounted } from "vue"
-import api from "../api/http"
+import { getPayments } from "@/services/paymentService"
 import BaseTable from "../components/BaseTable.vue"
 import SummaryCard from "../components/SummaryCard.vue"
 import { Formatter } from "../utils/formatter"
@@ -96,16 +96,12 @@ const fetchPayments = async () => {
   try {
     loading.value = true
     error.value = null
-
-    const res = await api.get("/payments", {
-      params: buildQuery()
-    })
-
+    const res = await getPayments(buildQuery())
+    console.log(res)
+    
     const data = res.data.data
-
     payments.value = data.payments ?? []
     summary.value = data.summary ?? fallbackSummary()
-
   } catch (err) {
     error.value = "Failed to load payments"
   } finally {
