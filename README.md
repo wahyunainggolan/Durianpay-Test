@@ -35,7 +35,11 @@ go run main.go
 Backend will run at : http://localhost:8080
 
 How to run backend server on production build:
-1. Copy and rename env.example to backend and frontend folder:
+1. Copy and rename env.example from root to backend and frontend folder/directory:
+--- in root 
+```bash
+cp env.example .env
+```
 --- frontend
 ```bash
 cp env.example frontend/.env
@@ -47,7 +51,7 @@ cp env.example backend/.env
 2. Configure your environment variables in .env, especially update JWT_SECRET=supersecret
 3. Build and run the backend using Docker: 
 ```bash
-docker-compose build --no-cache
+docker-compose build --no-cache 
 docker-compose up
 ```
 
