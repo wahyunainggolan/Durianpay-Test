@@ -63,6 +63,7 @@ import SummaryCard from "../components/SummaryCard.vue"
 import { Formatter } from "../utils/formatter"
 import { useRouter } from "vue-router"
 
+const router = useRouter()
 const payments = ref([])
 const summary = ref({
   total: 0,
@@ -70,16 +71,16 @@ const summary = ref({
   processing: 0,
   failed: 0
 })
-const router = useRouter()
+
 const status = ref("")
 const loading = ref(false)
 const error = ref(null)
 const page = ref(1)
+const totalPages = ref(1)
 const sort = ref({
   key: "",
   order: ""
 })
-
 const columns = [
   { key: "id", label: "ID", sortable: true },
   { key: "merchant", label: "Merchant" },
@@ -96,12 +97,14 @@ const fetchPayments = async () => {
   try {
     loading.value = true
     error.value = null
+
     const res = await getPayments(buildQuery())
-    console.log(res)
-    
     const data = res.data.data
+
     payments.value = data.payments ?? []
     summary.value = data.summary ?? fallbackSummary()
+    totalPages.value = data.total_pages ?? 1
+
   } catch (err) {
     error.value = "Failed to load payments"
   } finally {
@@ -109,15 +112,9 @@ const fetchPayments = async () => {
   }
 }
 
-const logout = () => {
-  localStorage.removeItem("token")
-  localStorage.removeItem("role")
-  router.push("/login")
-}
-
 const buildQuery = () => {
   const query = {
-    page: page.value,
+    page: page.value
   }
 
   if (status.value) {
@@ -142,8 +139,10 @@ const handleSort = ({ key, order }) => {
 }
 
 const nextPage = () => {
-  page.value++
-  fetchPayments()
+  if (page.value < totalPages.value) {
+    page.value++
+    fetchPayments()
+  }
 }
 
 const prevPage = () => {
@@ -151,6 +150,12 @@ const prevPage = () => {
     page.value--
     fetchPayments()
   }
+}
+
+const logout = () => {
+  localStorage.removeItem("token")
+  localStorage.removeItem("role")
+  router.push("/login")
 }
 
 const fallbackSummary = () => ({

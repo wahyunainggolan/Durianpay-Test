@@ -11,9 +11,11 @@
         </tbody>
       </table>
     </div>
+
     <div v-else-if="!rows.length" class="empty">
       No data available
     </div>
+
     <table v-else class="table">
       <thead>
         <tr>
@@ -30,6 +32,7 @@
           </th>
         </tr>
       </thead>
+
       <tbody>
         <tr v-for="row in rows" :key="row.id">
           <td v-for="col in columns" :key="col.key">
@@ -44,32 +47,54 @@
         </tr>
       </tbody>
     </table>
+
     <div class="pagination">
-      <button @click="$emit('prev')" :disabled="page <= 1">
-        Prev
+      <button
+        class="page-btn"
+        @click="emit('prev')"
+        :disabled="isFirstPage"
+      >
+        ← Prev
       </button>
-      <span>Page {{ page }}</span>
-      <button @click="$emit('next')">
-        Next
+
+      <div class="page-info">
+        <span class="page-current">{{ page }}</span>
+        <span class="page-separator">/</span>
+        <span class="page-total">{{ totalPages }}</span>
+      </div>
+
+      <button
+        class="page-btn primary"
+        @click="emit('next')"
+        :disabled="isLastPage"
+      >
+        Next →
       </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue"
+import { ref, computed } from "vue"
 
-defineProps({
+const props = defineProps({
   columns: Array,
   rows: Array,
   loading: Boolean,
-  page: Number
+  page: Number,
+  totalPages: {
+    type: Number,
+    default: 1
+  }
 })
 
 const emit = defineEmits(["sort", "next", "prev"])
 
 const sortKey = ref("")
 const sortOrder = ref("asc")
+
+const isFirstPage = computed(() => props.page <= 1)
+const isLastPage = computed(() => props.page >= props.totalPages)
 
 const handleSort = (col) => {
   if (!col.sortable) return
