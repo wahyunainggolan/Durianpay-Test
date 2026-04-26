@@ -52,7 +52,7 @@ cp env.example backend/.env
 2. Configure your environment variables in .env, especially update JWT_SECRET=supersecret
 3. Build and run the backend using Docker: 
 ```bash
-docker-compose build --no-cache //skipp only in vidio
+docker-compose build --no-cache
 docker-compose up
 ```
 
