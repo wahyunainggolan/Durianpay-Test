@@ -11,44 +11,89 @@ node v24.13.1
 
 Install all related requirements:
 
+--- backend 
 ```bash
-Add here
+cd backend
+go mod tidy
+```
+--- frontend 
+```bash
+cd frontend
+npm install
 ```
 
 How to run backend server on local:
 
 ```bash
-Add here
+cd backend
+go run main.go
 ```
+Backend will run at : http://localhost:8080
 
 How to run backend server on production build:
-
+1. Rename the environment file:
 ```bash
-Add here
+mv env.example .env
+```
+2. Configure your environment variables in .env, especially update JWT_SECRET=supersecret
+3. Build and run the backend using Docker: 
+```bash
+docker-compose up --build -d
+```
+4. Verify containers are running:
+```bash
+docker ps
+```
+
+Or build manually:
+```bash
+cd backend
+docker build -t go-backend .
+docker run -p 8080:8080 go-backend
 ```
 
 How to run frontend on local:
 
 ```bash
-Add here
+cd frontend
+npm run dev
 ```
+Frontend will run at: http://localhost:3000
 
 How to run frontend on production build:
 
+A. Run using Docker (Nginx) : 
 ```bash
-Add here
+docker build -t vue-frontend .
+docker run -p 3000:80 vue-frontend
 ```
 
-To checking openapi documentations, you can visit this url after backend running.
-
+B. Or via docker-compose:
+1. Rename the environment file:
 ```bash
-Add here
+mv env.example .env
+```
+2. Configure your environment variables in .env, especially update JWT_SECRET=supersecret
+3. Build and run the backend using Docker: 
+```bash
+docker-compose up --build -d
+```
+4. Verify containers are running:
+```bash
+docker ps
+```
+
+
+To checking openapi documentations, you can visit this url after backend running.
+After backend is running, you can access:
+```bash
+http://localhost:8080/openapi.yaml
 ```
 
 Login to frontend by visiting:
 
 ```bash
-Add here
+http://localhost:3000/login
 ```
 
 evidences: Add video evidences of your service
