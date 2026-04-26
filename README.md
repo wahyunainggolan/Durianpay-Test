@@ -31,9 +31,14 @@ go run main.go
 Backend will run at : http://localhost:8080
 
 How to run backend server on production build:
-1. Rename the environment file:
+1. Copy and rename env.example to backend and frontend folder:
+--- frontend
 ```bash
-mv env.example .env
+cp env.example frontend/.env
+```
+--- backend
+```bash
+cp env.example backend/.env
 ```
 2. Configure your environment variables in .env, especially update JWT_SECRET=supersecret
 3. Build and run the backend using Docker: 
@@ -66,9 +71,14 @@ docker run -p 3000:80 vue-frontend
 ```
 
 B. Or via docker-compose:
-1. Rename the environment file:
+1. Copy and rename env.example to backend and frontend folder:
+--- frontend
 ```bash
-mv env.example .env
+cp env.example frontend/.env
+```
+--- backend
+```bash
+cp env.example backend/.env
 ```
 2. Configure your environment variables in .env, especially update JWT_SECRET=supersecret
 3. Build and run the frontend using Docker: 
@@ -76,7 +86,6 @@ mv env.example .env
 docker-compose build --no-cache
 docker-compose up
 ```
-
 
 To checking openapi documentations, you can visit this url after backend running.
 After backend is running, you can access:
